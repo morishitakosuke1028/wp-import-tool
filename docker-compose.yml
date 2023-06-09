@@ -1,0 +1,42 @@
+
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+    - ./db/mysql:/var/lib/mysql  # マウントするローカルディレクトリを指定
+    ports: # ポートを指定し、外部から接続させる
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    volumes:
+      - ./html:/var/www/html # マウントするローカルディレクトリを指定
+    ports:
+      - "8000:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+
+# phpmyadminも用意してSQLを触れるようにしてます
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - 8888:80
+
+volumes:
+    db_data:
